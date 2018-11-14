@@ -12,9 +12,9 @@ def set_options(window):
 	neg2 = Radiobutton(window,text='Negative', value = -2, variable=selected, foreground="#e60000", background = bc_color)
 	neg3 = Radiobutton(window,text='Strongly Negative', value = -3, variable=selected, foreground="#e60000", background = bc_color)
 
+	pos3.pack(anchor=W)
 	pos1.pack(anchor=W)
 	pos2.pack(anchor=W)
-	pos3.pack(anchor=W)
 	neutral.pack(anchor=W)
 	neg1.pack(anchor=W)
 	neg2.pack(anchor=W)
