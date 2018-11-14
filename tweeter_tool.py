@@ -20,13 +20,15 @@ def set_options(window):
 	neg2.pack(anchor=W)
 	neg3.pack(anchor=W)
 
-def set_text(window):
-	global current_id
+def get_current_id():
 	if(os.path.isfile('current_id')):
 		current_id = int(open('current_id','r').read()) #Arquivo contendo a posição do tweet atual
 	else:
 		current_id = 0
-	text =  tweets[current_id]
+	return current_id
+
+def set_text(window, current_id):
+	text = tweets[current_id]
 	lbl = Label(window,text = text, font=("Helvetica", 12),wraplength=300, justify = LEFT,width = 60, height = 10, relief = 'solid', bg = bc_color)
 	lbl.pack()
 	return lbl
@@ -39,12 +41,12 @@ def read_text(fname = '/home/jcardoso/texts.txt'):
 def init_window():
 	window = Tk()
 	window.geometry('600x400') 
-	window.title("Tweeter tool")
+	window.title("Tweeter tool - " + str(current_id))
 	window.configure(background = bc_color)
 	window.resizable(False, False)
 	return window
 
-def next_tweet(lbl, num_tweets):
+def next_tweet(lbl,window, num_tweets):
    global current_id, labels
    labels[current_id] = selected.get()
    if(current_id + 1 == num_tweets):
@@ -52,9 +54,10 @@ def next_tweet(lbl, num_tweets):
    else:
    		current_id += 1
    selected.set(labels[current_id])
+   window.title("Tweeter tool - " + str(current_id))
    lbl.config(text= tweets[current_id])
 
-def previous_tweet(lbl, num_tweets):
+def previous_tweet(lbl,window, num_tweets):
    global current_id, labels
    labels[current_id] = selected.get()
    if(current_id == 0):
@@ -62,6 +65,7 @@ def previous_tweet(lbl, num_tweets):
    else:
    		current_id -= 1
    selected.set(labels[current_id])
+   window.title("Tweeter tool - " + str(current_id))
    lbl.config(text= tweets[current_id])
 
 def on_closing():
@@ -103,6 +107,8 @@ if(len(sys.argv) > 1):
 	print ("This is the name of the script: ", sys.argv[0])
 	print ("Tweets: ", sys.argv[1])
 	tweets_path = sys.argv[1]
+	print(tweets_path)
+	current_id = get_current_id()
 	tweets = read_text(tweets_path)
 	num_tweets = len(tweets)
 	labels = load_label_file('labels_' + os.path.basename(tweets_path))
@@ -110,7 +116,7 @@ if(len(sys.argv) > 1):
 
 ## --- Inicializar Interface ---- ##
 window = init_window()
-lbl = set_text(window)
+lbl = set_text(window, current_id)
 set_options(window)
 
 
@@ -120,8 +126,8 @@ bottom = Frame(window)
 top.pack(side=TOP)
 bottom.pack(side=BOTTOM, fill=BOTH, expand=True)
 
-prev_btn = Button(window, text="Prev", width=10, height=2, command= lambda: previous_tweet(lbl, num_tweets))
-next_btn = Button(window, text="Next", width=10, height=2, command= lambda: next_tweet(lbl, num_tweets))
+prev_btn = Button(window, text="Prev", width=10, height=2, command= lambda: previous_tweet(lbl,window, num_tweets))
+next_btn = Button(window, text="Next", width=10, height=2, command= lambda: next_tweet(lbl,window, num_tweets))
 prev_btn.pack(in_=top, side=LEFT)
 next_btn.pack(in_=top, side=LEFT)
 window.protocol("WM_DELETE_WINDOW", on_closing)
