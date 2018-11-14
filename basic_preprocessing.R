@@ -2,6 +2,7 @@ library(dplyr)
 library(purrr)
 library(stringr)
 library(stringi)
+library(magrittr)
 
 clean_tweets <- function(df){
   #Preprocessing
@@ -34,16 +35,31 @@ clean_tweets <- function(df){
 
 ###---- Pré-processamento básico------
 
-tweets_1o_turno <- readRDS("~/SentimentAnalysis/tweets_1o_turno.rds")
-tweets_2o_turno <- readRDS("~/SentimentAnalysis/tweets_2o_turno.rds")
+tweets_1o_turno <- readRDS("tweets_1o_turno.rds")
+tweets_2o_turno <- readRDS("tweets_2o_turno.rds")
 
 tweets_1o_turno <- clean_tweets(tweets_1o_turno)
 tweets_2o_turno <- clean_tweets(tweets_2o_turno)
 
-#Remover tweets repetidos
-tweets_1o_turno <- tweets_1o_turno %>% distinct(clean_tweet, .keep_all = TRUE)
-tweets_2o_turno <- tweets_2o_turno %>% distinct(clean_tweet, .keep_all = TRUE)
-
-
 saveRDS(tweets_1o_turno, 'clean_tweets_1o_turno.rds')
 saveRDS(tweets_2o_turno, 'clean_tweets_2o_turno.rds')
+
+
+#Preparar para extrair os textos para marcar:
+tweets_1o_turno %<>% mutate(tweet_id = row_number())
+tweets_2o_turno %<>% mutate(tweet_id = row_number())
+
+#Remover tweets repetidos
+tweets_1o_turno %<>% distinct(clean_tweet, .keep_all = TRUE)
+tweets_2o_turno %<>% distinct(clean_tweet, .keep_all = TRUE)
+
+#Extrair 500 tweets por candidato
+tweets_1o_turno %<>% group_by(candidate) %>%
+               slice(1:500)
+
+#Extrair 1500 tweets por candidato
+tweets_2o_turno %<>% group_by(candidate) %>%
+                slice(1:1500)
+
+write.table(tweets_1o_turno$clean_tweet,'text_1o_turno.txt', row.names = F, col.names = F)
+write.table(tweets_2o_turno$clean_tweet,'text_2o_turno.txt', row.names = F, col.names = F)
