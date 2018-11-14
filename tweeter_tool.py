@@ -4,17 +4,17 @@ def set_options(window):
 
 	neutral = Radiobutton(window,text='Neutral', value = 0, variable=selected, foreground="gray", background = bc_color)
 	#Positivos
-	pos1 = Radiobutton(window,text='Weakly positive', value = 1, variable=selected, foreground="#009900", background = bc_color)
+	pos1 = Radiobutton(window,text='Strongly Positive', value = 3, variable=selected, foreground="#009900", background = bc_color)
 	pos2 = Radiobutton(window,text='Positive', value = 2, variable=selected, foreground="#009900", background = bc_color)
-	pos3 = Radiobutton(window,text='Strongly Positive', value = 3, variable=selected, foreground="#009900", background = bc_color)
+	pos3 = Radiobutton(window,text='Weakly positive', value = 1, variable=selected, foreground="#009900", background = bc_color)
 	#Negativos
 	neg1 = Radiobutton(window,text='Weakly Negative', value = -1, variable=selected, foreground="#e60000", background = bc_color)
 	neg2 = Radiobutton(window,text='Negative', value = -2, variable=selected, foreground="#e60000", background = bc_color)
 	neg3 = Radiobutton(window,text='Strongly Negative', value = -3, variable=selected, foreground="#e60000", background = bc_color)
 
-	pos3.pack(anchor=W)
 	pos1.pack(anchor=W)
 	pos2.pack(anchor=W)
+	pos3.pack(anchor=W)
 	neutral.pack(anchor=W)
 	neg1.pack(anchor=W)
 	neg2.pack(anchor=W)
