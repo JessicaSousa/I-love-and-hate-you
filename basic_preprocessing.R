@@ -5,31 +5,18 @@ library(stringi)
 library(magrittr)
 
 clean_tweets <- function(df){
-  #Preprocessing
-  url_pattern <- "http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\\(\\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+"
-  # Get rid of URLs
-  df$clean_tweet <- str_replace_all(df$text,url_pattern, " ")
-  # Take out retweet header, there is only one
-  df$clean_tweet <- str_replace(df$clean_tweet,"(RT|via)((?:\\b\\W*@\\w+)+)"," ")
-  # Get rid of hashtags
-  df$clean_tweet <- str_replace_all(df$clean_tweet,"#\\S+"," ")
-  # Get rid of references to other screennames
-  df$clean_tweet <- str_replace_all(df$clean_tweet,"@\\S+"," ") 
-  #remover emojis
-  df$clean_tweet <- str_replace_all(df$clean_tweet,"\\p{So}|\\p{Cn}", " ")
-  #remover simbolos de comparação > <
-  df$clean_tweet <- str_replace_all(df$clean_tweet,"&\\S+", " ")
-  #remover quebra de linhas
-  df$clean_tweet = str_replace_all(df$clean_tweet, "[\r\n]" , " ")
-  #remover acentuação e caracteres estranhos
-  df$clean_tweet <- stri_trans_general(df$clean_tweet, "Latin-ASCII")
-  df$clean_tweet <- iconv(df$clean_tweet, "latin1", "ASCII", sub="")
-  #get rid of unnecessary spaces
-  df$clean_tweet <- str_replace_all(df$clean_tweet,"\\s+"," ")
-  df$clean_tweet <- str_replace_all(df$clean_tweet, "^\\s+|\\s+$", "")
-  #minusculas
-  df$clean_tweet <- tolower(df$clean_tweet)
-  df
+  df$stripped_text <- df$text %>%
+                      str_replace_all("http\\S+\\s*", " ") %>% #Remover links
+                      str_replace_all("^([A-Za-z] [A-Za-z])+"," ")%>% # Remover sequencias de apenas 1 letras
+                      str_replace_all("#\\S+|@\\S+", " ") %>%  #Remover hashtags e menções
+                      str_replace_all("[\r\n]", " ") %>% #Remover quebras de linhas
+                      stri_trans_general("Latin-ASCII") %>% #Remover acentuações
+                      str_replace_all("[^\x01-\x7F]", " ") %>% #Remover emojis
+                      str_replace_all("[:punct:]"," ")%>% # Remover pontuações
+                      str_replace_all("\\s+"," ") %>% #Remover excesso de espaços em brancos
+                      str_trim() %>% #Remover espaço em branco do começo e fim
+                      tolower()
+  return(df)
 }
 
 
@@ -45,21 +32,21 @@ saveRDS(tweets_1o_turno, 'clean_tweets_1o_turno.rds')
 saveRDS(tweets_2o_turno, 'clean_tweets_2o_turno.rds')
 
 
-#Preparar para extrair os textos para marcar:
-tweets_1o_turno %<>% mutate(tweet_id = row_number())
-tweets_2o_turno %<>% mutate(tweet_id = row_number())
+##Preparar para extrair os textos para marcar:
+#tweets_1o_turno %<>% mutate(tweet_id = row_number())
+#tweets_2o_turno %<>% mutate(tweet_id = row_number())
 
-#Remover tweets repetidos
-tweets_1o_turno %<>% distinct(clean_tweet, .keep_all = TRUE)
-tweets_2o_turno %<>% distinct(clean_tweet, .keep_all = TRUE)
+##Remover tweets repetidos
+#tweets_1o_turno %<>% distinct(stripped_text, .keep_all = TRUE)
+#tweets_2o_turno %<>% distinct(stripped_text, .keep_all = TRUE)
 
-#Extrair 500 tweets por candidato
-tweets_1o_turno %<>% group_by(candidate) %>%
-               slice(1:500)
+##Extrair 500 tweets por candidate
+#tweets_1o_turno %<>% group_by(candidate) %>%
+#               slice(1:500)
 
-#Extrair 1500 tweets por candidato
-tweets_2o_turno %<>% group_by(candidate) %>%
-                slice(1:1500)
+##Extrair 1500 tweets por candidato
+#tweets_2o_turno %<>% group_by(candidate) %>%
+#                slice(1:1500)
 
-write.table(tweets_1o_turno$clean_tweet,'text_1o_turno.txt', row.names = F, col.names = F)
-write.table(tweets_2o_turno$clean_tweet,'text_2o_turno.txt', row.names = F, col.names = F)
+#write.table(tweets_1o_turno$stripped_text,'text_1o_turno.txt', row.names = F, col.names = F)
+#write.table(tweets_2o_turno$stripped_text,'text_2o_turno.txt', row.names = F, col.names = F)
