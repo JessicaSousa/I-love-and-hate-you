@@ -9,7 +9,7 @@ clean_tweets <- function(df){
                       str_replace_all("http\\S+\\s*", " ") %>% #Remover links
                       stri_trans_general("Latin-ASCII") %>% #Remover acentuações
                       str_replace_all("[^\x01-\x7F]", "") %>% #Remover emojis
-                      str_replace_all("\\b(.)\\1+"," ")%>% # Remover palavras formadas por apenas uma letra
+                      str_replace_all("\\b(.)\\1+(\\s|$)"," ")%>% # Remover palavras formadas por apenas uma letra
                       str_replace_all("\\B([@#][\\w_-]+)", " ") %>%  #Remover hashtags e menções
                       str_replace_all("[\r\n]", " ") %>% #Remover quebras de linhas
                       str_replace_all("[:punct:]"," ")%>% # Remover pontuações
