@@ -7,11 +7,11 @@ library(magrittr)
 clean_tweets <- function(df){
   df$stripped_text <- df$text %>%
                       str_replace_all("http\\S+\\s*", " ") %>% #Remover links
-                      str_replace_all("^([A-Za-z] [A-Za-z])+"," ")%>% # Remover sequências de apenas 1 letra
+                      stri_trans_general("Latin-ASCII") %>% #Remover acentuações
+                      str_replace_all("[^\x01-\x7F]", "") %>% #Remover emojis
+                      str_replace_all("\\b(.)\\1+"," ")%>% # Remover palavras formadas por apenas uma letra
                       str_replace_all("\\B([@#][\\w_-]+)", " ") %>%  #Remover hashtags e menções
                       str_replace_all("[\r\n]", " ") %>% #Remover quebras de linhas
-                      stri_trans_general("Latin-ASCII") %>% #Remover acentuações
-                      str_replace_all("[^\x01-\x7F]", " ") %>% #Remover emojis
                       str_replace_all("[:punct:]"," ")%>% # Remover pontuações
                       str_replace_all("\\s+"," ") %>% #Remover excesso de espaços em brancos
                       str_trim() %>% #Remover espaço em branco do começo e fim
