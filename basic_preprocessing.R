@@ -13,7 +13,7 @@ clean_tweets <- function(df){
                       str_replace_all("\\B([@#][\\w_-]+)", " ") %>%  #Remover hashtags e menções
                       str_replace_all("[\r\n]", " ") %>% #Remover quebras de linhas
                       str_replace_all("[:punct:]"," ")%>% # Remover pontuações
-                      str_replace("\\d", " ") %>% # Remover digitos
+                      str_replace("\\d+", " ") %>% # Remover digitos
                       str_replace_all("\\s+"," ") %>% #Remover excesso de espaços em brancos
                       str_trim() %>% #Remover espaço em branco do começo e fim
                       tolower()
